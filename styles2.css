@@ -1,0 +1,203 @@
+/* General Styling */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /* font-family: 'Poppins', sans-serif; */
+    font-family: 'Charis SIL', serif;
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #333;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #3b82f6;
+    margin-bottom: 10px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-bottom: 20px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+#startString {
+    font-size: 2rem;
+    color: #16a34a;
+    margin: 20px 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.textbox {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.textbox:focus {
+    border-color: #121312;
+    outline: none;
+}
+
+.btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #fff;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #13aa43;
+}
+
+.btn-secondary {
+    background-color: #13863f;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+.timer, .score {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-top: 10px;
+}
+
+#rounds {
+    font-size: 1rem;
+    color: #374151;
+    margin-top: 10px;
+}
+
+.feedback {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #d97706;
+    margin-top: 15px;
+}
+
+#playAgainContainer .btn-secondary {
+    background-color: #6366f1;
+}
+
+#playAgainContainer {
+    margin-top: 20px;
+}
+
+
+.game-container {
+    background-color: #f8f9fa;
+    border-radius: 55px;
+    box-shadow: 0 4px 15px rgba(15, 13, 158, 0.1);
+    padding: 30px;
+    min-width: 500px;
+    max-width: 600px;
+    width: auto;
+    height: auto; /* Allow container to grow with content */
+    text-align: center;
+    margin: 20px auto;
+}
+
+.scrollable-content {
+    max-height: 50vh; /* Large enough for most content */
+    overflow-y: auto;
+    margin-top: 10px;
+    padding-right: 10px;
+}
+
+
+
+.scrollable-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+    .subtitle {
+        font-size: 0.9rem;
+    }
+}
+
+.audio-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.audio-controls button {
+    width: 200px;
+    margin: 5px 0;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.audio-controls button:hover {
+    background-color: #0056b3;
+}
+
+
+.volume-control label {
+    margin-right: 10px;
+    font-size: 16px;
+    
+}
+
+#volumeSlider {
+    width: 150px;
+    
+}
+
+.volume-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+}

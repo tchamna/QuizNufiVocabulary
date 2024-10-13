@@ -1,0 +1,66 @@
+/* Custom CSS styles to enhance the interface */
+body {
+    background: linear-gradient(to right, #74ebd5, #acb6e5);
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    padding-top: 50px;
+}
+.game-container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.textbox {
+    padding: 15px;
+    width: 100%;
+    margin-bottom: 20px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+.button {
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 10px;
+}
+.score, .timer, .feedback, #definition, #rounds {
+    margin-top: 20px;
+    font-size: 20px;
+}
+.timer {
+    color: #e74c3c;
+}
+.feedback {
+    color: #27ae60;
+}
+#definition {
+    color: #2980b9;
+}
+h1 {
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+#startString {
+    font-size: 36px;
+    color: #8e44ad;
+    margin-bottom: 20px;
+}
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .game-container {
+        padding: 20px;
+    }
+    .textbox, .button {
+        font-size: 16px;
+    }
+    .score, .timer, .feedback, #definition, #rounds {
+        font-size: 18px;
+    }
+    #startString {
+        font-size: 28px;
+    }
+}

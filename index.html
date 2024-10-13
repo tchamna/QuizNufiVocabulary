@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Má' mbíághə̀ə̀</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        /* Custom CSS styles to enhance the interface */
+        body {
+            background: linear-gradient(to right, #74ebd5, #acb6e5);
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            padding-top: 50px;
+        }
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .textbox {
+            padding: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+        .button {
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 10px;
+        }
+        .score, .timer, .feedback, #definition, #rounds {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .timer {
+            color: #e74c3c;
+        }
+        .feedback {
+            color: #27ae60;
+        }
+        #definition {
+            color: #2980b9;
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        #startString {
+            font-size: 36px;
+            color: #8e44ad;
+            margin-bottom: 20px;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .game-container {
+                padding: 20px;
+            }
+            .textbox, .button {
+                font-size: 16px;
+            }
+            .score, .timer, .feedback, #definition, #rounds {
+                font-size: 18px;
+            }
+            #startString {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Má' mbíághə̀ə̀</h1>
+    <p>Njá'zū mɑ̀ yáá mɑ̀ntō' pí (Words starting with) ...</p>
+    <h2 id="startString"></h2>
+    <input type="text" id="userInput" class="textbox" placeholder="Ŋwɑ̌' njâ'wú séè lè ..." />
+    <button onclick="submitWord()" id="submitButton" class="button btn btn-primary">Cǎh njâ'wū</button>
+
+    <div class="timer">⏱ Mvǎkntìè': <span id="timeRemaining">60</span> seconds</div>
+    <div class="score">💯 Mvǎk pìì: <span id="score">0</span></div>
+    <div id="rounds"></div>
+    <div class="feedback" id="feedback"></div>
+    <div id="definition"></div>
+    <!-- File input to upload the Excel file -->
+    <div class="mt-4">
+        <p><strong>Upload your Excel file containing words and definitions:</strong></p>
+        <input type="file" id="fileInput" accept=".xlsx, .xls" class="form-control-file" />
+    </div>
+    <!-- Play Again button -->
+    <div id="playAgainContainer" style="display:none; margin-top: 20px;">
+        <button onclick="playAgain()" class="btn btn-success">Pàtntām</button>
+    </div>
+</div>
+
+<!-- Include jQuery and Bootstrap JS (required for Bootstrap components) -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- Include the SheetJS library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+    const totalRounds = 3;
+    const timePerRound = 60; // Set the timer duration here
+    let wordDatabase = [];
+    let usedWords = [];
+    let currentWordPrefix = '';
+    let validWordSubset = [];
+    let score = 0;
+    let round = 1;
+    let timer;
+    let timeLeft = timePerRound; // Use the global timePerRound variable
+    let gameOver = false;
+
+    document.getElementById('userInput').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            submitWord();
+        }
+    });
+
+    // Function to read the Excel file
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) {
+            alert("Please select an Excel file.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            // Assuming the words and definitions are in the first sheet
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            // Extract words and definitions
+            wordDatabase = jsonData.map(row => {
+                return {
+                    word: row['Word'].toLowerCase().trim(),
+                    definition: row['Definition']
+                };
+            }).filter(entry => entry.word.length > 0);
+
+            console.log('Words loaded:', wordDatabase);
+            // Start the game after loading the words
+            startRound();
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    function getWordsStartingWith(prefix) {
+        return wordDatabase.filter(entry => entry.word.startsWith(prefix));
+    }
+
+//     function startRound() {
+//     if (wordDatabase.length === 0) {
+//         alert("Word database is empty. Please upload a valid Excel file.");
+//         return;
+//     }
+
+//     if (round > totalRounds) {
+//         endGame();
+//         return;
+//     }
+
+//     document.getElementById("userInput").value = ''; // Clear input
+//     document.getElementById("definition").innerText = ''; // Clear definition
+//     document.getElementById("userInput").disabled = false; // Enable input
+//     document.getElementById("submitButton").disabled = false; // Enable button
+
+//     // Randomly generate a 2-letter prefix and get valid words for the round
+//     while (true) {
+//         const randomEntry = wordDatabase[Math.floor(Math.random() * wordDatabase.length)];
+//         currentWordPrefix = randomEntry.word.substring(0, 2); // Use the first two letters
+//         validWordSubset = getWordsStartingWith(currentWordPrefix); // Filter the subset for this round
+
+//         // Ensure there are at least 10 valid words starting with this prefix
+//         if (validWordSubset.length >=10) {
+//             break; // If a valid subset is found, exit the loop
+//         }
+//     }
+
+//     document.getElementById("startString").innerText = currentWordPrefix.toUpperCase(); // Display the two starting letters
+//     document.getElementById("feedback").innerText = ''; // Clear feedback
+//     document.getElementById("rounds").innerText = "🔄 Round: " + round + " / " + totalRounds;
+
+//     usedWords = []; // Reset used words for this round
+
+//     resetTimer();
+// }
+
+    function submitWord() {
+        if (gameOver) {
+            return; // Do nothing if the game is over
+        }
+
+        const userWord = document.getElementById("userInput").value.toLowerCase().trim();
+
+        if (userWord.length === 0) {
+            return; // Do nothing if input is empty
+        }
+
+        if (!userWord.startsWith(currentWordPrefix)) {
+            document.getElementById("feedback").innerText = "❌ Incorrect! The word must start with '" + currentWordPrefix.toUpperCase() + "'.";
+            document.getElementById("definition").innerText = '';
+        } else if (usedWords.includes(userWord)) {
+            document.getElementById("feedback").innerText = "⚠️ You already used this word!";
+            document.getElementById("definition").innerText = '';
+        } else {
+            const foundEntry = validWordSubset.find(entry => entry.word === userWord);
+            if (foundEntry) {
+                score += userWord.length;
+                usedWords.push(userWord);
+                document.getElementById("score").innerText = score;
+                document.getElementById("feedback").innerText = "✅ Correct! You scored " + userWord.length + " points.";
+                document.getElementById("definition").innerText = "📖 Definition: " + foundEntry.definition;
+            } else {
+                document.getElementById("feedback").innerText = "❌ Word not found!";
+                document.getElementById("definition").innerText = '';
+            }
+        }
+
+        document.getElementById("userInput").value = ''; // Clear input
+    }
+
+    function resetTimer() {
+        clearInterval(timer);
+        timeLeft = timePerRound; // Use the global timePerRound variable
+        document.getElementById("timeRemaining").innerText = timeLeft;
+
+        timer = setInterval(function() {
+            timeLeft--;
+            document.getElementById("timeRemaining").innerText = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                document.getElementById("feedback").innerText = "⏰ Time's up! Moving to the next round.";
+                document.getElementById("definition").innerText = '';
+                nextRound();
+            }
+        }, 1000);
+    }
+
+    // function nextRound() {
+    //     round++;
+    //     if (round <= totalRounds) {
+    //         startRound();
+    //     } else {
+    //         endGame();
+    //     }
+    // }
+    let usedPrefixes = []; // Track prefixes used in previous rounds
+
+function startRound() {
+    if (wordDatabase.length === 0) {
+        alert("Word database is empty. Please upload a valid Excel file.");
+        return;
+    }
+
+    if (round > totalRounds) {
+        endGame();
+        return;
+    }
+
+    document.getElementById("userInput").value = ''; // Clear input
+    document.getElementById("definition").innerText = ''; // Clear definition
+    document.getElementById("userInput").disabled = false; // Enable input
+    document.getElementById("submitButton").disabled = false; // Enable button
+
+    // Randomly generate a 2-letter prefix and get valid words for the round
+    while (true) {
+        const randomEntry = wordDatabase[Math.floor(Math.random() * wordDatabase.length)];
+        currentWordPrefix = randomEntry.word.substring(0, 2); // Use the first two letters
+        validWordSubset = getWordsStartingWith(currentWordPrefix); // Filter the subset for this round
+
+        // Ensure there are at least 10 valid words starting with this prefix and the prefix is not reused
+        if (validWordSubset.length >= 10 && !usedPrefixes.includes(currentWordPrefix)) {
+            usedPrefixes.push(currentWordPrefix); // Add the new prefix to the list of used prefixes
+            break; // Exit the loop once a valid prefix is found
+        }
+    }
+
+    document.getElementById("startString").innerText = currentWordPrefix.toUpperCase(); // Display the two starting letters
+    document.getElementById("feedback").innerText = ''; // Clear feedback
+    document.getElementById("rounds").innerText = "🔄 Round: " + round + " / " + totalRounds;
+
+    usedWords = []; // Reset used words for this round
+
+    resetTimer();
+}
+
+function nextRound() {
+    // Calculate the remaining words
+    const remainingWords = validWordSubset
+        .filter(entry => !usedWords.includes(entry.word))
+        .map(entry => entry.word);
+
+    // Display the remaining words at the end of the round
+    if (remainingWords.length > 0) {
+        document.getElementById("definition").innerText = "❗ Remaining words: " + remainingWords.join(", ");
+    } else {
+        document.getElementById("definition").innerText = "✅ Great job! You found all the words!";
+    }
+
+    round++;
+    if (round <= totalRounds) {
+        // Move to the next round after a brief delay to let the user see the remaining words
+        setTimeout(startRound, 15000);
+    } else {
+        // End the game if all rounds are completed
+        setTimeout(endGame, 15000);
+    }
+}
+
+    function endGame() {
+        gameOver = true;
+        document.getElementById("feedback").innerText = "🎉 Sʉ̀ɑ́ mìè! Yò mvǎkpìí mɑ́ " + score;
+        document.getElementById("definition").innerText = '';
+        document.getElementById("userInput").disabled = true; // Disable input
+        document.getElementById("submitButton").disabled = true; // Disable button
+        document.getElementById("startString").innerText = '';
+        document.getElementById("rounds").innerText = '';
+        document.getElementById("timeRemaining").innerText = '0';
+        clearInterval(timer);
+        // Show the Play Again button
+        document.getElementById("playAgainContainer").style.display = 'block';
+    }
+
+    function playAgain() {
+        // Reset game variables
+        score = 0;
+        round = 1;
+        gameOver = false;
+        document.getElementById("score").innerText = score;
+        document.getElementById("feedback").innerText = '';
+        document.getElementById("definition").innerText = '';
+        document.getElementById("playAgainContainer").style.display = 'none';
+        startRound();
+    }
+
+    // Removed window.onload = startRound; to prevent the game from starting before uploading the Excel file
+</script>
+
+</body>
+</html>

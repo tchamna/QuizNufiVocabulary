@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Má' Mbíághə̀ə̄ Nùfī</title>
+    <link rel="stylesheet" href="styles2.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Má' Mbíághə̀ə̄ Nùfī</h1>
+    <p class="subtitle">Njá'zū mɑ̀ yáá mɑ̀ntō' pí ...</p>
+    <h2 id="startString">...</h2>
+
+    <!-- Start Game Button -->
+    <input type="text" id="userInput" class="textbox" placeholder="Ŋwɑ̌' njâ'wú séè lè ..." disabled />
+    <button id="startButton" class="btn btn-primary">Tō' Sʉ̀ɑ̀</button>
+
+    <div class="timer">⏱ Mvǎkntìè': <span id="timeRemaining">60</span> </div>
+    <div class="score">💯 Mvǎkpìì: <span id="score">0</span></div>
+    <div id="rounds"></div>
+    <div class="feedback" id="feedback"></div>
+
+    <!-- Scrollable definition section -->
+    <div class="scrollable-content">
+        <div id="definition"></div>
+    </div>
+
+    
+
+    <!-- Audio Control Buttons -->
+    <div class="audio-controls">
+        <button onclick="toggleBackgroundMusic()">Pū'/Pēh Yɔ̌nshì</button>
+        <!-- <button onclick="toggleFeedbackSounds()">Toggle Feedback Sounds</button> -->
+        <!-- <button onclick="decreaseBackgroundVolume()">Fī' nzhì yɔ̌nshì</button>
+        <button onclick="increaseBackgroundVolume()">Kō'sī nzhì yɔ̌nshì</button> -->
+    </div>
+
+    <!-- Volume Control Slider -->
+    <div class="volume-control">
+        <label for="volumeSlider">Nzhì yɔ̌nshì:</label>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.5" oninput="adjustBackgroundVolume(this.value)">
+    </div>
+    
+
+
+
+    <!-- Audio Elements -->
+    <audio id="backgroundMusic" loop>
+        <source src="./resources/background_music_Kameni_Lebong_Esclavage.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound">
+        <source src="./resources/correct_answer1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="incorrectSound">
+        <source src="./resources/wrong_answer1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Play Again button -->
+    <div id="playAgainContainer" style="display:none; margin-top: 20px;">
+        <button onclick="playAgain()" class="btn btn-secondary">Pàtntām</button>
+    </div>
+
+    <!-- Help Section for Input Guide -->
+    <div class="help-section">
+        <h3>Kôsì (Help)</h3>
+        <p><code>uu1</code> = <code>ʉ̀</code>, <code>eu3</code> = <code>ə̄</code>, <code>o*7</code> = <code>ɔ̌</code>, etc.</p>
+    </div>
+</div>
+
+    <!-- Link to external JavaScript file -->
+    <script src="../firebaseConfig.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
